@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SB PREMIUM STORE — Premium Experience</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>SB</text></svg>">
+<style>
+  /* ============ Theme & Reset ============ */
+  :root{
+    --bg:#071023; --card:#0f1724; --muted:#94a3b8; --gold:#E3B448; --accent:#f59e0b;
+    --glass: rgba(255,255,255,0.04); --success:#10b981; --white:#eef2ff;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;color:var(--white);background:linear-gradient(180deg,#071023 0%, #04111b 100%);-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  /* ============ Header ============ */
+  header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;background:linear-gradient(90deg,#071026 0%, #071827 100%);border-bottom:1px solid rgba(255,255,255,0.02)}
+  .brand{display:flex;gap:14px;align-items:center}
+  .logomark{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#c0852a);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+  .logomark span{font-weight:900;color:#111}
+  .brand h1{font-size:18px;margin:0}
+  .tag{font-size:12px;color:var(--muted);margin-top:3px}
+
+  nav{display:flex;gap:12px;align-items:center}
+  .nav-link{padding:8px 12px;border-radius:8px;color:var(--white);opacity:0.92}
+  .nav-cta{background:rgba(255,255,255,0.03)}
+  .cart-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:linear-gradient(90deg,#0b1220,#071028);cursor:pointer}
+
+  /* ============ Layout ============ */
+  main{max-width:1180px;margin:22px auto;padding:16px;display:grid;grid-template-columns:300px 1fr;gap:20px}
+  @media (max-width:980px){main{grid-template-columns:1fr;padding:12px}}
+
+  /* Sidebar */
+  .sidebar{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+  .search{display:flex;gap:8px;margin-bottom:12px}
+  .search input{flex:1;padding:10px;border-radius:10px;border:0;background:rgba(255,255,255,0.03);color:var(--white)}
+  .small{font-size:13px;color:var(--muted)}
+
+  .filters{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+  .filter-btn{padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--white);cursor:pointer}
+  .filter-btn.active{outline:2px solid rgba(255,255,255,0.03)}
+
+  /* Content */
+  .hero{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:16px;border-radius:12px;margin-bottom:12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:12px;transition:transform .25s ease, box-shadow .25s;cursor:pointer;overflow:hidden;position:relative}
+  .card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(2,6,23,0.6)}
+  .card img{width:100%;height:160px;object-fit:cover;border-radius:10px;display:block;transition:transform .35s ease}
+  .card:hover img{transform:scale(1.04)}
+  .card h3{margin:10px 0 6px;font-size:15px}
+  .desc{color:var(--muted);font-size:13px;min-height:36px}
+  .meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+  .price{font-weight:800;color:var(--gold);font-size:16px}
+  .card .actions{display:flex;gap:8px}
+
+  /* floating add animation */
+  .fly {
+    position:fixed;z-index:9999;pointer-events:none;border-radius:8px;transform-origin:center center;
+    transition:transform .9s cubic-bezier(.2,.9,.2,1), opacity .9s ease;
+  }
+
+  /* cart drawer */
+  .cart-drawer{position:fixed;right:18px;bottom:18px;background:linear-gradient(90deg,#071022,#071827);padding:12px;border-radius:12px;box-shadow:0 30px 60px rgba(0,0,0,0.6);width:380px;max-width:94vw;display:none;flex-direction:column;gap:10px}
+  .cart-drawer.active{display:flex}
+  .cart-item{display:flex;gap:10px;align-items:center}
+  .cart-item img{width:64px;height:64px;object-fit:cover;border-radius:8px}
+  .cart-actions{display:flex;gap:8px;justify-content:flex-end}
+
+  /* Pages (SPA) */
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn .28s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Checkout / QR / Success */
+  .checkout {display:grid;grid-template-columns:1fr 360px;gap:18px}
+  @media (max-width:980px){.checkout{grid-template-columns:1fr}}
+  .card-panel{background:var(--card);padding:14px;border-radius:10px}
+  .qr-box{display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px}
+  .qr-box img{width:220px;height:220px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+  .timer{font-weight:800;color:var(--gold)}
+
+  /* success overlay */
+  .success-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(90deg,rgba(2,6,23,0.72),rgba(2,6,23,0.76));z-index:9999}
+  .success-overlay.active{display:flex}
+  .success-card{background:linear-gradient(180deg,#0b1724,#071022);padding:28px;border-radius:14px;text-align:center;color:var(--white);width:520px;max-width:92vw;box-shadow:0 40px 90px rgba(2,6,23,0.8)}
+  .order-id{font-weight:900;color:var(--gold);font-size:22px;margin-top:8px}
+
+  /* confetti (simple) */
+  .confetti{position:absolute;left:50%;top:0;width:12px;height:24px;background:var(--gold);opacity:0.9;transform-origin:center;animation:confettiFall 1.6s linear forwards}
+  @keyframes confettiFall{to{transform:translateY(520px) rotate(520deg);opacity:0}}
+
+  /* small utilities */
+  .muted{color:var(--muted)}
+  .btn{background:linear-gradient(90deg,var(--gold),#f0b449);border:0;padding:10px 14px;border-radius:8px;font-weight:800;cursor:pointer;color:#111}
+  .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--white)}
+  .input, input, select, textarea{width:100%;padding:10px;border-radius:8px;border:0;background:rgba(255,255,255,0.03);color:var(--white)}
+  .center{display:flex;align-items:center;justify-content:center}
+  footer{padding:18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="brand">
+    <div class="logomark" aria-hidden><span>SB</span></div>
+    <div>
+      <h1>SB PREMIUM STORE</h1>
+      <div class="tag">Curated premium products • QR UPI checkout</div>
+    </div>
+  </div>
+  <nav>
+    <a class="nav-link" href="#" onclick="navigate('home')">Home</a>
+    <a class="nav-link" href="#" onclick="navigate('products')">Products</a>
+    <div class="cart-btn nav-cta" onclick="toggleDrawer()">
+      🛒 <span id="cartCount">0</span>
+    </div>
+  </nav>
+</header>
+
+<!-- MAIN LAYOUT (SPA pages inside) -->
+<main>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="search">
+      <input id="searchInput" placeholder="Search products..." onkeyup="if(event.key==='Enter') doSearch()">
+      <button class="btn" onclick="doSearch()">Search</button>
+    </div>
+
+    <div style="margin-top:12px">
+      <div style="font-weight:800;margin-bottom:8px">Categories</div>
+      <div class="filters">
+        <button class="filter-btn active" data-cat="all" onclick="filterBy('all', this)">All</button>
+        <button class="filter-btn" data-cat="audio" onclick="filterBy('audio', this)">Audio</button>
+        <button class="filter-btn" data-cat="wearables" onclick="filterBy('wearables', this)">Wearables</button>
+        <button class="filter-btn" data-cat="photo" onclick="filterBy('photo', this)">Cameras</button>
+        <button class="filter-btn" data-cat="computing" onclick="filterBy('computing', this)">Computing</button>
+        <button class="filter-btn" data-cat="lifestyle" onclick="filterBy('lifestyle', this)">Lifestyle</button>
+      </div>
+    </div>
+
+    <div style="margin-top:16px" class="card-panel">
+      <div style="font-weight:800">Cart Summary</div>
+      <div id="miniCart" style="margin-top:10px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+        <div class="muted">Total</div>
+        <div id="miniTotal" style="font-weight:900">₹0</div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn" onclick="navigate('cart')">View Cart</button>
+        <button class="btn secondary" onclick="clearCart()">Clear</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <section style="min-height:60vh">
+
+    <!-- HOME PAGE -->
+    <div id="home" class="page active">
+      <section class="hero card-panel">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h2 style="margin:0 0 6px 0">Premium Products</h2>
+            <div class="muted">Explore our curated collection — click a product to see details.</div>
+          </div>
+          <div class="center">
+            <button class="btn" onclick="navigate('products')">Shop Now</button>
+          </div>
+        </div>
+      </section>
+
+      <h3 style="margin-top:12px">Featured</h3>
+      <div id="featuredGrid" class="grid" style="margin-top:12px"></div>
+    </div>
+
+    <!-- PRODUCTS PAGE -->
+    <div id="products" class="page">
+      <h2>All Products</h2>
+      <div id="productGrid" class="grid" style="margin-top:12px"></div>
+    </div>
+
+    <!-- PRODUCT DETAIL PAGE -->
+    <div id="product" class="page">
+      <button class="btn secondary" onclick="navigate('products')">← Back</button>
+      <div style="margin-top:12px" id="productDetail"></div>
+    </div>
+
+    <!-- CART PAGE -->
+    <div id="cart" class="page">
+      <h2>Your Cart</h2>
+      <div id="cartItems" style="margin-top:12px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <div class="muted">Shipping</div>
+        <div style="font-weight:900">₹99</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <div style="font-weight:900">Total</div><div id="cartTotal" style="font-weight:900">₹0</div>
+      </div>
+      <div style="margin-top:12px">
+        <button class="btn" onclick="navigate('checkout')">Proceed to Checkout</button>
+      </div>
+    </div>
+
+    <!-- CHECKOUT PAGE -->
+    <div id="checkout" class="page">
+      <h2>Checkout</h2>
+      <div class="checkout" style="margin-top:12px">
+        <div>
+          <div class="card-panel">
+            <div style="font-weight:800">Contact & Shipping</div>
+            <div style="margin-top:8px">
+              <label class="small">Full name</label><input id="shipName" class="input" placeholder="Name">
+              <label class="small">Phone</label><input id="shipPhone" class="input" placeholder="+91">
+              <label class="small">Address</label><textarea id="shipAddr" class="input" rows="3" placeholder="Street, City, State, PIN"></textarea>
+            </div>
+          </div>
+          <div class="card-panel" style="margin-top:12px">
+            <div style="font-weight:800">Payment Method</div>
+            <div style="margin-top:10px;display:flex;gap:8px">
+              <button class="btn secondary method active" data-method="upi" onclick="selectMethod(this)">UPI (QR)</button>
+              <button class="btn secondary method" data-method="bank" onclick="selectMethod(this)">Bank Transfer</button>
+              <button class="btn secondary method" data-method="card" onclick="selectMethod(this)">Card</button>
+            </div>
+            <div id="methodInfo" class="muted" style="margin-top:10px">Choose UPI QR to simulate a real scan & pay workflow.</div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="card-panel">
+            <div style="font-weight:800">Order Summary</div>
+            <div id="summaryList" style="margin-top:10px"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:10px"><div class="muted">Subtotal</div><div id="summarySub">₹0</div></div>
+            <div style="display:flex;justify-content:space-between;margin-top:6px"><div class="muted">Shipping</div><div>₹99</div></div>
+            <div style="display:flex;justify-content:space-between;margin-top:12px"><div style="font-weight:900">Total</div><div id="summaryTotal" style="font-weight:900">₹0</div></div>
+            <div style="margin-top:12px"><button class="btn" id="startPayment">Pay Securely</button></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- QR PAGE -->
+    <div id="qr" class="page">
+      <h2>QR Payment</h2>
+      <div class="card-panel center" style="flex-direction:column;gap:14px">
+        <div class="muted">Open your UPI app and scan the QR below</div>
+        <div class="qr-box">
+          <img id="qrImage" src="" alt="UPI QR">
+          <div class="timer" id="qrTimer">02:00</div>
+          <div class="muted">Amount: <span id="qrAmount">₹0</span></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="paidBtn">I have paid</button>
+            <button class="btn secondary" id="cancelPay">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<!-- CART DRAWER -->
+<div id="drawer" class="cart-drawer" role="dialog" aria-hidden="true">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div style="font-weight:900">Your Cart</div>
+    <div><button class="btn secondary" onclick="toggleDrawer()">Close</button></div>
+  </div>
+  <div id="drawerItems" style="margin-top:10px"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+    <div class="muted">Total</div><div id="drawerTotal" style="font-weight:900">₹0</div>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+    <button class="btn secondary" onclick="navigate('cart');toggleDrawer()">View Cart</button>
+    <button class="btn" onclick="navigate('checkout');toggleDrawer()">Checkout</button>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div id="successOverlay" class="success-overlay" aria-hidden="true">
+  <div class="success-card" role="alertdialog" aria-modal="true">
+    <div style="font-size:28px;font-weight:900">Order Confirmed</div>
+    <div style="margin-top:8px" class="muted">Thank you — your order is placed successfully</div>
+    <div class="order-id" id="successOrderId"></div>
+    <div style="margin-top:12px">
+      <button class="btn" onclick="closeSuccess()">Continue Shopping</button>
+    </div>
+  </div>
+</div>
+
+<footer>© 2025 SB PREMIUM STORE</footer>
+
+<script>
+/* ================= Data: 10 products ================= */
+const PRODUCTS = [
+  {id:1, title:"Luxury Watch", price:4999, cat:"lifestyle", img:"images/watch.jpg", desc:"Premium stainless steel watch with sapphire glass and 5ATM water resistance."},
+  {id:2, title:"Wireless Earbuds", price:2999, cat:"audio", img:"images/earbuds.jpg", desc:"True wireless earbuds with ANC, deep bass and long battery life."},
+  {id:3, title:"Galaxy Buds2 Pro", price:17999, cat:"audio", img:"images/buds2pro.jpg", desc:"Studio-quality sound with advanced ANC and comfortable fit."},
+  {id:4, title:"Dell 27\" 4K Monitor", price:32999, cat:"computing", img:"images/monitor.jpg", desc:"27-inch 4K UHD monitor with excellent color accuracy for creators."},
+  {id:5, title:"Canon EOS DSLR", price:36999, cat:"photo", img:"images/camera.jpg", desc:"24.1MP DSLR with WiFi connectivity and easy controls."},
+  {id:6, title:"Fossil Gen 6 Smartwatch", price:24995, cat:"wearables", img:"images/smartwatch.jpg", desc:"AMOLED display, fast charging and premium finish."},
+  {id:7, title:"Gaming Keyboard RGB", price:2499, cat:"computing", img:"images/keyboard.jpg", desc:"Mechanical keys, programmable RGB and tactile response."},
+  {id:8, title:"Premium Sunglasses", price:3499, cat:"lifestyle", img:"images/sunglasses.jpg", desc:"Polarized UV protection with premium frame."},
+  {id:9, title:"Travel Backpack", price:5599, cat:"lifestyle", img:"images/2backpack.jpg", desc:"Water-resistant backpack with organized compartments."},
+  {id:10, title:"Luxury Perfume", price:5999, cat:"lifestyle", img:"images/perfume.jpg", desc:"Long-lasting signature fragrance with premium notes."}
+];
+
+/* ================= State ================= */
+let state = {
+  page: 'home',
+  cart: JSON.parse(localStorage.getItem('sb_cart')||'[]'),
+  buyNow: JSON.parse(localStorage.getItem('sb_buy_now')||'null')
+};
+
+/* ================= Util ================= */
+function formatINR(n){ return n.toLocaleString('en-IN'); }
+function saveCart(){ localStorage.setItem('sb_cart', JSON.stringify(state.cart)); renderMiniCart(); updateCartCount(); }
+function updateCartCount(){ document.querySelectorAll('#cartCount').forEach(e=> e.textContent = state.cart.reduce((s,i)=>s+i.qty,0)); }
+
+/* ================= Navigation (SPA) ================= */
+function navigate(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  state.page = page;
+  history.replaceState(null,'',`#${page}`);
+  if(page==='home'){ renderFeatured() }
+  if(page==='products'){ renderProducts() }
+  if(page==='product'){ /* product content generated separately */ }
+  if(page==='cart'){ renderCart() }
+  if(page==='checkout'){ prepareCheckout() }
+  if(page==='qr'){ prepareQR() }
+}
+
+/* ================= Render: Featured & Products ================= */
+function renderFeatured(){
+  const f = document.getElementById('featuredGrid');
+  f.innerHTML='';
+  PRODUCTS.slice(0,6).forEach(p=> f.appendChild(createCard(p)));
+}
+function renderProducts(filter='all'){
+  const grid = document.getElementById('productGrid');
+  grid.innerHTML='';
+  const list = filter==='all' ? PRODUCTS : PRODUCTS.filter(x=>x.cat===filter);
+  list.forEach(p=> grid.appendChild(createCard(p)));
+}
+function createCard(p){
+  const el = document.createElement('article'); el.className='card product-card';
+  el.innerHTML = `
+    <img src="${p.img}" alt="${p.title}">
+    <h3>${p.title}</h3>
+    <div class="desc">${p.desc}</div>
+    <div class="meta">
+      <div class="price">₹ ${formatINR(p.price)}</div>
+      <div class="actions">
+        <button class="btn" onclick="event.stopPropagation(); addToCart(${p.id},1, true)">Add</button>
+        <button class="btn secondary" onclick="event.stopPropagation(); quickView(${p.id})">View</button>
+      </div>
+    </div>
+  `;
+  el.addEventListener('click', ()=> openProduct(p.id));
+  return el;
+}
+
+/* ================= Filters & Search ================= */
+function filterBy(cat, btn){
+  document.querySelectorAll('.filter-btn').forEach(b=> b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderProducts(cat);
+}
+function doSearch(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  if(!q){ renderProducts(); return; }
+  const results = PRODUCTS.filter(p=> p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+  const grid = document.getElementById('productGrid'); grid.innerHTML='';
+  if(results.length===0) grid.innerHTML = '<div class="muted">No results found.</div>';
+  results.forEach(p=> grid.appendChild(createCard(p)));
+  navigate('products');
+}
+
+/* ================= Product detail ================= */
+function openProduct(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  const detail = document.getElementById('productDetail');
+  detail.innerHTML = `
+    <div style="display:grid;grid-template-columns:360px 1fr;gap:18px">
+      <div><img src="${p.img}" style="width:100%;border-radius:10px"></div>
+      <div>
+        <h2>${p.title}</h2>
+        <div class="muted">${p.desc}</div>
+        <div style="margin-top:12px;font-weight:900;color:var(--gold);font-size:20px">₹ ${formatINR(p.price)}</div>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+          <input id="qtyInput" type="number" value="1" min="1" style="width:84px;padding:8px;border-radius:8px;border:0;background:rgba(255,255,255,0.03);color:var(--white)">
+          <button class="btn" onclick="addToCart(${p.id}, Number(document.getElementById('qtyInput').value||1))">Add to Cart</button>
+          <button class="btn secondary" onclick="buyNow(${p.id}, Number(document.getElementById('qtyInput').value||1))">Buy Now</button>
+        </div>
+        <div style="margin-top:18px">
+          <h4>Specifications</h4>
+          <ul class="muted">
+            <li>Genuine product</li>
+            <li>Premium packaging</li>
+            <li>Official warranty where applicable</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  `;
+  navigate('product');
+}
+
+/* ================= Cart operations ================= */
+function addToCart(id, qty=1, animate=false){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  const existing = state.cart.find(i=>i.id===id);
+  if(existing) existing.qty += qty; else state.cart.push({id:p.id,title:p.title,price:p.price,img:p.img,qty:qty});
+  saveCart();
+  if(animate) animateFlyToCart(id);
+  showToast('Added to cart');
+}
+function animateFlyToCart(id){
+  try{
+    const p = PRODUCTS.find(x=>x.id===id);
+    const img = document.querySelector(`.product-card img[src="${p.img}"]`) || document.querySelector('.card img');
+    if(!img) return;
+    const clone = img.cloneNode(true); clone.className='fly';
+    document.body.appendChild(clone);
+    const rect = img.getBoundingClientRect();
+    clone.style.left = rect.left + 'px'; clone.style.top = rect.top + 'px'; clone.style.width = rect.width + 'px'; clone.style.opacity=1;
+    const cartBtn = document.querySelector('.cart-btn');
+    const cartRect = cartBtn.getBoundingClientRect();
+    requestAnimationFrame(()=>{
+      clone.style.transform = `translate(${cartRect.left - rect.left}px, ${cartRect.top - rect.top}px) scale(.2)`;
+      clone.style.opacity = 0;
+    });
+    setTimeout(()=> clone.remove(),900);
+  }catch(e){}
+}
+function removeFromCart(id){
+  state.cart = state.cart.filter(i=>i.id!==id);
+  saveCart(); renderCart(); renderDrawer();
+}
+function changeQty(id, delta){
+  const it = state.cart.find(i=>i.id===id); if(!it) return;
+  it.qty = Math.max(1, it.qty + delta); saveCart(); renderCart(); renderDrawer();
+}
+function clearCart(){ if(confirm('Clear cart?')){ state.cart = []; saveCart(); renderCart(); renderDrawer(); showToast('Cart cleared'); } }
+
+/* ================= Render mini / drawer / cart ================= */
+function renderMiniCart(){
+  const mini = document.getElementById('miniCart'); mini.innerHTML='';
+  state.cart.slice(0,3).forEach(it=>{
+    const div = document.createElement('div'); div.style.display='flex'; div.style.gap='8px'; div.style.alignItems='center';
+    div.innerHTML = `<img src="${it.img}" style="width:56px;height:56px;object-fit:cover;border-radius:6px"><div style="flex:1"><div style="font-weight:700">${it.title}</div><div class="muted">₹${formatINR(it.price)} × ${it.qty}</div></div><div style="font-weight:900">₹${formatINR(it.qty*it.price)}</div>`;
+    mini.appendChild(div);
+  });
+  document.getElementById('miniTotal').textContent = '₹' + formatINR(state.cart.reduce((s,i)=>s+i.qty*i.price,0));
+}
+function renderDrawer(){
+  const dr = document.getElementById('drawerItems'); dr.innerHTML='';
+  state.cart.forEach(it=>{
+    const div = document.createElement('div'); div.className='cart-item';
+    div.innerHTML = `<img src="${it.img}"><div style="flex:1"><div style="font-weight:700">${it.title}</div><div class="muted">₹${formatINR(it.price)} × ${it.qty}</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <div style="display:flex;gap:6px">
+          <button class="btn secondary" onclick="changeQty(${it.id},-1)">-</button>
+          <div style="min-width:28px;text-align:center">${it.qty}</div>
+          <button class="btn" onclick="changeQty(${it.id},1)">+</button>
+        </div>
+        <button class="btn secondary" onclick="removeFromCart(${it.id})">Remove</button>
+      </div>`;
+    dr.appendChild(div);
+  });
+  document.getElementById('drawerTotal').textContent = '₹' + formatINR(state.cart.reduce((s,i)=>s+i.qty*i.price,0));
+}
+function renderCart(){
+  const area = document.getElementById('cartItems'); area.innerHTML='';
+  if(state.cart.length===0){ area.innerHTML = '<div class="muted">Your cart is empty.</div>'; document.getElementById('cartTotal').textContent='₹0'; return; }
+  state.cart.forEach(it=>{
+    const div = document.createElement('div'); div.className='cart-item';
+    div.innerHTML = `<img src="${it.img}" class="thumb"><div style="flex:1"><div style="font-weight:700">${it.title}</div><div class="muted">₹${formatINR(it.price)}</div></div>
+      <div style="text-align:right"><div style="font-weight:900">₹${formatINR(it.price*it.qty)}</div>
+      <div style="display:flex;gap:6px;margin-top:8px;justify-content:flex-end">
+        <button class="btn secondary" onclick="changeQty(${it.id},-1)">-</button>
+        <div style="min-width:28px;text-align:center">${it.qty}</div>
+        <button class="btn" onclick="changeQty(${it.id},1)">+</button>
+        <button class="btn secondary" onclick="removeFromCart(${it.id})">Remove</button>
+      </div></div>`;
+    area.appendChild(div);
+  });
+  const subtotal = state.cart.reduce((s,i)=>s+i.qty*i.price,0);
+  document.getElementById('cartTotal').textContent = '₹' + formatINR(subtotal + 99);
+}
+
+/* ================= Buy Now ================= */
+function buyNow(id, qty=1){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  localStorage.setItem('sb_buy_now', JSON.stringify({id:p.id,title:p.title,price:p.price,img:p.img,qty:qty}));
+  state.buyNow = JSON.parse(localStorage.getItem('sb_buy_now'));
+  navigate('checkout');
+}
+
+/* ================= Checkout preparation ================= */
+function prepareCheckout(){
+  // if buy_now present, show single item, else show cart
+  const buy = JSON.parse(localStorage.getItem('sb_buy_now')||'null');
+  const summary = document.getElementById('summaryList'); summary.innerHTML='';
+  let subtotal = 0;
+  if(buy){
+    const div = document.createElement('div'); div.className='summary-line'; div.innerHTML = `<div>${buy.title} × ${buy.qty}</div><div>₹ ${formatINR(buy.price*buy.qty)}</div>`;
+    summary.appendChild(div); subtotal = buy.price * buy.qty;
+  } else {
+    state.cart.forEach(it=>{
+      const div = document.createElement('div'); div.className='summary-line'; div.innerHTML = `<div>${it.title} × ${it.qty}</div><div>₹ ${formatINR(it.price*it.qty)}</div>`;
+      summary.appendChild(div); subtotal += it.price * it.qty;
+    });
+  }
+  document.getElementById('summarySub').textContent = '₹' + formatINR(subtotal);
+  document.getElementById('summaryTotal').textContent = '₹' + formatINR(subtotal + 99);
+
+  document.getElementById('startPayment').onclick = function(){
+    // simple validation
+    if(!document.getElementById('shipName').value.trim() || !document.getElementById('shipPhone').value.trim() || !document.getElementById('shipAddr').value.trim()){
+      alert('Please fill name, phone and address to continue');
+      return;
+    }
+    // default to UPI QR
+    navigate('qr');
+  }
+}
+
+/* ================= QR Page logic ================= */
+let qrTimerInt = null;
+function prepareQR(){
+  // compute amount
+  const buy = JSON.parse(localStorage.getItem('sb_buy_now')||'null');
+  let subtotal = buy ? buy.price * buy.qty : state.cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const total = subtotal + 99;
+  document.getElementById('qrAmount').textContent = '₹' + formatINR(total);
+  // generate QR URL (static formatted data)
+  const upiData = encodeURIComponent(`upi://pay?pa=sb@upi&pn=SB Premium Store&am=${total}`);
+  document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${upiData}`;
+  // timer
+  let remaining = 120;
+  document.getElementById('qrTimer').textContent = formatTime(remaining);
+  clearInterval(qrTimerInt);
+  qrTimerInt = setInterval(()=>{ remaining--; if(remaining<=0){ clearInterval(qrTimerInt); alert('QR expired'); navigate('checkout'); return; } document.getElementById('qrTimer').textContent = formatTime(remaining); },1000);
+
+  document.getElementById('paidBtn').onclick = function(){
+    // simulate verification and success
+    const orderId = 'SB' + Math.floor(Math.random()*900000 + 100000);
+    // record order
+    const orders = JSON.parse(localStorage.getItem('sb_orders')||'[]');
+    const orderRecord = {orderId, created:new Date().toISOString(), total};
+    orders.unshift(orderRecord); localStorage.setItem('sb_orders', JSON.stringify(orders));
+    // clear cart/buynow
+    localStorage.removeItem('sb_cart'); localStorage.removeItem('sb_buy_now'); state.cart = []; state.buyNow = null; saveCart();
+    // show success overlay
+    showSuccess(orderId);
+  };
+
+  document.getElementById('cancelPay').onclick = function(){
+    if(confirm('Cancel and return to checkout?')){ clearInterval(qrTimerInt); navigate('checkout'); }
+  };
+}
+function formatTime(sec){ const m = String(Math.floor(sec/60)).padStart(2,'0'); const s = String(sec%60).padStart(2,'0'); return `${m}:${s}`; }
+
+/* ================= Success overlay & confetti ================= */
+function showSuccess(orderId){
+  const overlay = document.getElementById('successOverlay');
+  document.getElementById('successOrderId').textContent = orderId;
+  overlay.classList.add('active');
+  // confetti burst
+  for(let i=0;i<28;i++){
+    const c = document.createElement('div'); c.className='confetti';
+    c.style.left = (50 + (Math.random()*60 - 30)) + '%';
+    c.style.background = `hsl(${Math.random()*60+30},80%,55%)`;
+    c.style.transform = `translateY(-40px) rotate(${Math.random()*360}deg)`;
+    c.style.opacity = 1;
+    document.body.appendChild(c);
+    setTimeout(()=> c.remove(),1600);
+  }
+}
+function closeSuccess(){ document.getElementById('successOverlay').classList.remove('active'); navigate('home'); }
+
+/* ================= Drawer toggle ================= */
+function toggleDrawer(){ const d = document.getElementById('drawer'); d.classList.toggle('active'); renderDrawer(); }
+
+/* ================= Toast ================= */
+function showToast(txt){
+  const t = document.createElement('div'); t.textContent = txt;
+  Object.assign(t.style,{position:'fixed',left:'50%',transform:'translateX(-50%)',bottom:'18px',background:'#052f2f',color:'#bff0e0',padding:'10px 16px',borderRadius:'10px',boxShadow:'0 10px 30px rgba(0,0,0,0.6)',zIndex:9999});
+  document.body.appendChild(t); setTimeout(()=>{ t.style.transition='all .3s'; t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(20px)'; setTimeout(()=>t.remove(),350); },1500);
+}
+
+/* ================= Init ================= */
+function init(){
+  // initial render
+  renderFeatured(); renderProducts(); renderMiniCart(); updateCartCount(); renderDrawer();
+  // wire up nav hash
+  const hash = location.hash.replace('#','') || 'home';
+  navigate(hash);
+  window.addEventListener('hashchange', ()=>{ const h = location.hash.replace('#','') || 'home'; navigate(h); });
+  // open products page if clicking products nav
+  document.querySelectorAll('.nav-link').forEach(a=> a.addEventListener('click', e=>{e.preventDefault(); navigate(a.getAttribute('onclick').match(/'(\w+)'/)[1])}));
+}
+init();
+
+/* expose small helpers for console testing (optional) */
+window.PRODUCTS = PRODUCTS;
+window.state = state;
+</script>
+</body>
+</html>
